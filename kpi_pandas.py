@@ -2,7 +2,7 @@ import pandas as pd
 
 # Carga los datos directo desde tu app en Vercel.
 # Reemplaza la URL por la de tu app + /portfolio.csv una vez desplegada.
-url = "https://TU-APP.vercel.app/portfolio.csv"
+url = url = "https://assigment-isaias.vercel.app/portfolio.csv"
 df = pd.read_csv(url)
 
 # --- Cálculo del KPI ---

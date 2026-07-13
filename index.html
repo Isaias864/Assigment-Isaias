@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>InvesTrack — Cartera de inversión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0E1626;
+    --surface:#16213A;
+    --surface-2:#1E2C4A;
+    --line:#2A3A5C;
+    --text:#E8ECF4;
+    --muted:#8A96AD;
+    --gain:#35D6A4;
+    --loss:#FF6B7A;
+    --brand:#6C8BFF;
+    --gold:#F2C14E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:"Inter",system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:clamp(20px,4vw,56px);
+  }
+  .wrap{max-width:920px;margin:0 auto}
+
+  /* Header */
+  header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:36px}
+  .logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:22px;letter-spacing:-.5px}
+  .logo span{color:var(--brand)}
+  .tag{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);border:1px solid var(--line);padding:4px 10px;border-radius:20px}
+
+  /* Hero KPI */
+  .hero{
+    background:linear-gradient(160deg,var(--surface) 0%,#131d33 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:clamp(24px,4vw,40px);
+    margin-bottom:20px;
+  }
+  .hero .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .kpi-number{
+    font-family:"JetBrains Mono",monospace;
+    font-weight:700;
+    font-size:clamp(52px,11vw,88px);
+    line-height:1;
+    letter-spacing:-2px;
+  }
+  .kpi-number.up{color:var(--gain)}
+  .kpi-number.down{color:var(--loss)}
+  .kpi-sub{font-size:15px;color:var(--muted);margin-top:12px}
+  .kpi-sub b{color:var(--text);font-family:"JetBrains Mono",monospace}
+
+  /* Stat row */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .stat .value{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:500}
+  @media(max-width:560px){.stats{grid-template-columns:1fr}}
+
+  /* Section title */
+  .sec-title{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px;margin:0 0 4px}
+  .sec-desc{font-size:14px;color:var(--muted);margin-bottom:18px}
+
+  /* Ledger bars */
+  .ledger{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:28px}
+  .row{display:grid;grid-template-columns:130px 1fr 96px;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .row .name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .track{position:relative;height:22px;background:var(--surface-2);border-radius:6px;overflow:hidden}
+  .center-line{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+  .bar{position:absolute;top:3px;bottom:3px;border-radius:4px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+  .bar.pos{left:50%;background:var(--gain)}
+  .bar.neg{right:50%;background:var(--loss)}
+  .row .pct{font-family:"JetBrains Mono",monospace;font-size:14px;text-align:right;font-weight:500}
+  .pct.pos{color:var(--gain)}
+  .pct.neg{color:var(--loss)}
+  @media(max-width:560px){.row{grid-template-columns:96px 1fr 64px;gap:8px}}
+
+  /* Projector */
+  .projector{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .fields{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+  @media(max-width:560px){.fields{grid-template-columns:1fr}}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+  .field input{
+    width:100%;background:var(--ink);border:1px solid var(--line);border-radius:10px;
+    color:var(--text);font-family:"JetBrains Mono",monospace;font-size:16px;padding:11px 12px;
+  }
+  .field input:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:transparent}
+  .result{background:var(--surface-2);border-radius:12px;padding:18px;text-align:center}
+  .result .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .result .fv{font-family:"JetBrains Mono",monospace;font-size:34px;font-weight:700;color:var(--gold);margin-top:6px}
+  .result .gain-note{font-size:13px;color:var(--muted);margin-top:6px}
+  .result .gain-note b{color:var(--gain)}
+
+  footer{margin-top:32px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+  .src{font-family:"JetBrains Mono",monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">Inves<span>Track</span></div>
+    <div class="tag" id="source-tag">cargando datos…</div>
+  </header>
+
+  <!-- HERO: el KPI principal -->
+  <section class="hero">
+    <div class="eyebrow">KPI · Rendimiento total de la cartera</div>
+    <div class="kpi-number" id="kpi">0.0%</div>
+    <div class="kpi-sub">Invertido <b id="kpi-inv">$0</b> · Valor hoy <b id="kpi-now">$0</b></div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="label">Total invertido</div><div class="value" id="s-inv">$0</div></div>
+    <div class="stat"><div class="label">Valor actual</div><div class="value" id="s-now">$0</div></div>
+    <div class="stat"><div class="label">Ganancia / pérdida</div><div class="value" id="s-gain">$0</div></div>
+  </div>
+
+  <!-- LEDGER -->
+  <h2 class="sec-title">Desglose por activo</h2>
+  <p class="sec-desc">Cada barra crece hacia la derecha si el activo gana, hacia la izquierda si pierde.</p>
+  <div class="ledger" id="ledger"></div>
+
+  <!-- PROJECTOR -->
+  <h2 class="sec-title">Proyector de interés compuesto</h2>
+  <p class="sec-desc">Simula cuánto valdría una inversión con aportaciones mensuales.</p>
+  <div class="projector">
+    <div class="fields">
+      <div class="field"><label>Monto inicial ($)</label><input id="p-initial" type="number" value="10000" /></div>
+      <div class="field"><label>Aportación mensual ($)</label><input id="p-monthly" type="number" value="1000" /></div>
+      <div class="field"><label>Rendimiento anual (%)</label><input id="p-rate" type="number" value="8" /></div>
+      <div class="field"><label>Años</label><input id="p-years" type="number" value="10" /></div>
+    </div>
+    <div class="result">
+      <div class="label">Valor futuro estimado</div>
+      <div class="fv" id="p-fv">$0</div>
+      <div class="gain-note">Aportado <b id="p-contrib">$0</b> · Interés ganado <b id="p-interest">$0</b></div>
+    </div>
+  </div>
+
+  <footer>
+    App educativa con datos de ejemplo · no es asesoría de inversión.<br>
+    Datos: <span class="src">portfolio.csv</span> · InvesTrack para Web App Sprint
+  </footer>
+
+</div>
+
+<script>
+  const fmt = n => "$" + Math.round(n).toLocaleString("es-MX");
+
+  // Datos de respaldo (por si el CSV no carga al abrir el archivo localmente)
+  const FALLBACK = [
+    {activo:"CETES", monto_invertido:5000, valor_actual:5320},
+    {activo:"NAFTRAC (S&P/BMV)", monto_invertido:8000, valor_actual:9450},
+    {activo:"Bitcoin", monto_invertido:3000, valor_actual:4200},
+    {activo:"FEMSA (KOF)", monto_invertido:6000, valor_actual:5580},
+    {activo:"Cemex", monto_invertido:4000, valor_actual:4380},
+    {activo:"Fondo Renta Fija", monto_invertido:7000, valor_actual:7280},
+  ];
+
+  function parseCSV(text){
+    const lines = text.trim().split(/\r?\n/);
+    const headers = lines[0].split(",");
+    return lines.slice(1).map(line=>{
+      // separa por comas que NO estén dentro de paréntesis, para nombres como "NAFTRAC (S&P/BMV)"
+      const parts = line.split(",");
+      // reconstruye: los primeros campos son el nombre, los 2 últimos los números
+      const valor = Number(parts.pop());
+      const monto = Number(parts.pop());
+      const activo = parts.join(",");
+      return {activo, monto_invertido:monto, valor_actual:valor};
+    });
+  }
+
+  function render(data){
+    const totalInv = data.reduce((a,r)=>a+r.monto_invertido,0);
+    const totalNow = data.reduce((a,r)=>a+r.valor_actual,0);
+    const gain = totalNow - totalInv;
+    const ret = (gain/totalInv)*100;
+    const up = ret >= 0;
+
+    const kpi = document.getElementById("kpi");
+    kpi.textContent = (up?"+":"") + ret.toFixed(1) + "%";
+    kpi.className = "kpi-number " + (up?"up":"down");
+    document.getElementById("kpi-inv").textContent = fmt(totalInv);
+    document.getElementById("kpi-now").textContent = fmt(totalNow);
+    document.getElementById("s-inv").textContent = fmt(totalInv);
+    document.getElementById("s-now").textContent = fmt(totalNow);
+    const sg = document.getElementById("s-gain");
+    sg.textContent = (gain>=0?"+":"-") + fmt(Math.abs(gain));
+    sg.style.color = gain>=0 ? "var(--gain)" : "var(--loss)";
+
+    // barras: escala según el % de mayor magnitud
+    const maxMag = Math.max(...data.map(r=>Math.abs((r.valor_actual-r.monto_invertido)/r.monto_invertido)));
+    const ledger = document.getElementById("ledger");
+    ledger.innerHTML = "";
+    data.forEach(r=>{
+      const pct = (r.valor_actual-r.monto_invertido)/r.monto_invertido*100;
+      const pos = pct>=0;
+      const width = maxMag>0 ? Math.abs(pct/100)/maxMag*50 : 0; // % del track (hasta 50%)
+      const row = document.createElement("div");
+      row.className="row";
+      row.innerHTML =
+        '<div class="name">'+r.activo+'</div>'+
+        '<div class="track"><div class="center-line"></div>'+
+          '<div class="bar '+(pos?"pos":"neg")+'" style="width:0%"></div></div>'+
+        '<div class="pct '+(pos?"pos":"neg")+'">'+(pos?"+":"")+pct.toFixed(1)+'%</div>';
+      ledger.appendChild(row);
+      // anima el ancho
+      requestAnimationFrame(()=>{ row.querySelector(".bar").style.width = width+"%"; });
+    });
+  }
+
+  // Proyector de interés compuesto
+  function project(){
+    const P = Number(document.getElementById("p-initial").value)||0;
+    const m = Number(document.getElementById("p-monthly").value)||0;
+    const r = (Number(document.getElementById("p-rate").value)||0)/100/12;
+    const n = (Number(document.getElementById("p-years").value)||0)*12;
+    let fv;
+    if(r===0){ fv = P + m*n; }
+    else{ fv = P*Math.pow(1+r,n) + m*((Math.pow(1+r,n)-1)/r); }
+    const contrib = P + m*n;
+    const interest = fv - contrib;
+    document.getElementById("p-fv").textContent = fmt(fv);
+    document.getElementById("p-contrib").textContent = fmt(contrib);
+    document.getElementById("p-interest").textContent = fmt(interest);
+  }
+  ["p-initial","p-monthly","p-rate","p-years"].forEach(id=>
+    document.getElementById(id).addEventListener("input", project)
+  );
+
+  // Carga los datos: primero intenta el CSV, si falla usa el respaldo
+  fetch("portfolio.csv")
+    .then(res=>{ if(!res.ok) throw new Error(); return res.text(); })
+    .then(text=>{ render(parseCSV(text)); document.getElementById("source-tag").textContent="fuente: portfolio.csv"; })
+    .catch(()=>{ render(FALLBACK); document.getElementById("source-tag").textContent="fuente: datos de ejemplo"; });
+
+  project();
+</script>
+</body>
+</html>
